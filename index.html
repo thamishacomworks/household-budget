@@ -12,7 +12,7 @@
 
   <title>Household Budget</title>
 
-  <link rel="stylesheet" href="./style.css">
+ <link rel="stylesheet" href="./style.css?v=2">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
 
@@ -199,6 +199,14 @@
             + Record expense
           </button>
         </div>
+
+        <button
+  id="downloadReport"
+  type="button"
+  class="secondary report-button"
+>
+  Download monthly PDF
+</button>
 
         <section class="card opening-card">
           <div>
@@ -561,6 +569,7 @@
   <div id="toast" role="status" aria-live="polite"></div>
 
  <script src="./app.js?v=7" defer></script>
+ <script src="./report.js?v=1" defer></script>
 
 <!-- Custom app popup -->
 <dialog id="appDialog" class="app-dialog">

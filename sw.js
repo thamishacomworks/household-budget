@@ -1,12 +1,13 @@
-const CACHE_NAME = "household-budget-v7";
+const CACHE_NAME = "household-budget-v9";
 
 const APP_ROOT = new URL("./", self.location.href);
 
 const APP_FILES = [
   "./",
   "./index.html",
-  "./style.css",
+  "./style.css?v=2",
  "./app.js?v=7",
+ "./report.js?v=1",
   "./manifest.webmanifest",
   "./icon.svg"
 ].map((path) => new URL(path, APP_ROOT).href);
