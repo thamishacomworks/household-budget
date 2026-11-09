@@ -14,6 +14,6 @@ Add each person's contributions, record monthly bills and extra expenses, and se
 Your records stay in your browser and do not sync between devices. Back up your data regularly.
 
 ### 🌐 Live Demo
-[Open Household Budget](https://super-bread-a24f.pramodithameesha.workers.dev/)
+[Open Household Budget](https://household-budget.pramodithameesha.workers.dev/)
 
 Built with HTML, CSS, and JavaScript.
