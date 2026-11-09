@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta name="theme-color" content="#164638">
+
+  <title>Household Budget</title>
+
+  <link rel="stylesheet" href="./style.css">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+
+<!-- Link preview -->
+<meta property="og:type" content="website">
+
+<meta property="og:site_name" content="Household Budget">
+
+<meta
+  property="og:title"
+  content="Household Budget — Manage Your Home Expenses"
+>
+
+<meta
+  property="og:description"
+  content="Track household contributions, manage monthly bills, and see your available balance. Simple, private, and saved on your device."
+>
+
+<meta
+  property="og:url"
+  content="https://house-hold-budget.netlify.app/"
+>
+
+<meta
+  property="og:image"
+  content="https://house-hold-budget.netlify.app/images/household-budget-share.png"
+>
+
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<meta
+  property="og:image:alt"
+  content="Household Budget — track contributions, bills and everyday expenses."
+>
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="./" class="brand">
+        <span class="brand-icon" aria-hidden="true">⌂</span>
+
+        <span>
+          Household Budget
+          <small>Your home. Your money. Clearly organised.</small>
+        </span>
+      </a>
+
+      <span class="device-badge">
+        Saved on this device
+      </span>
+    </div>
+  </header>
+
+  <main class="container">
+    <p
+      id="appError"
+      class="error-box"
+      role="alert"
+      hidden
+    ></p>
+
+    <fieldset id="appControls" disabled>
+
+      <!-- Visible on every screen -->
+      <section class="toolbar">
+        <div>
+          <p class="eyebrow">YOUR HOUSEHOLD MONEY BOOK</p>
+
+          <h1 id="screenTitle">Dashboard</h1>
+
+          <p id="screenDescription" class="muted">
+            A quick look at your household finances.
+          </p>
+        </div>
+
+        <label>
+          Select month
+
+          <input
+            type="month"
+            id="monthPicker"
+            required
+          >
+        </label>
+      </section>
+
+      <!-- App navigation -->
+      <nav class="app-nav" aria-label="Main navigation">
+        <button
+          type="button"
+          data-screen-target="dashboard"
+          aria-current="page"
+        >
+          <span class="nav-symbol" aria-hidden="true">▦</span>
+          <span>Dashboard</span>
+        </button>
+
+        <button
+          type="button"
+          data-screen-target="contributions"
+        >
+          <span class="nav-symbol" aria-hidden="true">↓</span>
+          <span>Money in</span>
+        </button>
+
+        <button
+          type="button"
+          data-screen-target="expenses"
+        >
+          <span class="nav-symbol" aria-hidden="true">↑</span>
+          <span>Expenses</span>
+        </button>
+
+        <button
+          type="button"
+          data-screen-target="history"
+        >
+          <span class="nav-symbol" aria-hidden="true">≡</span>
+          <span>History</span>
+        </button>
+
+        <button
+          type="button"
+          data-screen-target="settings"
+        >
+          <span class="nav-symbol" aria-hidden="true">⚙</span>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      <!-- DASHBOARD SCREEN -->
+      <section
+        class="app-screen"
+        data-screen="dashboard"
+        aria-label="Dashboard"
+      >
+        <section class="summary">
+          <article class="balance-card">
+            <span id="monthLabel"></span>
+
+            <p id="balanceLabel">Available balance</p>
+
+            <strong id="balanceTotal">0.00</strong>
+
+            <small>
+              Opening balance + contributions − expenses
+            </small>
+          </article>
+
+          <article class="summary-card">
+            <p>Total contributions</p>
+
+            <strong id="incomeTotal">0.00</strong>
+
+            <small id="incomeCount">0 entries</small>
+          </article>
+
+          <article class="summary-card">
+            <p>Total expenses</p>
+
+            <strong id="expenseTotal">0.00</strong>
+
+            <small id="expenseCount">0 entries</small>
+          </article>
+        </section>
+
+        <div class="dashboard-actions">
+          <button
+            type="button"
+            data-go-screen="contributions"
+          >
+            + Add contribution
+          </button>
+
+          <button
+            type="button"
+            class="secondary"
+            data-go-screen="expenses"
+          >
+            + Record expense
+          </button>
+        </div>
+
+        <section class="card opening-card">
+          <div>
+            <h2>Opening balance</h2>
+
+            <p class="muted">
+              Money available at the beginning of this month.
+            </p>
+          </div>
+
+         <form id="openingForm" class="inline-form">
+  <input
+    id="openingAmount"
+    type="number"
+    min="-1000000000"
+    max="1000000000"
+    step="0.01"
+    inputmode="decimal"
+    aria-label="Opening balance"
+    required
+  >
+
+  <button type="submit">Save</button>
+
+  <button
+    id="clearOpening"
+    type="button"
+    class="secondary"
+  >
+    Clear
+  </button>
+</form>
+          <button
+            id="carryForward"
+            type="button"
+            class="secondary"
+            hidden
+          >
+            Use previous month's balance
+          </button>
+
+          <p class="help">
+            Previous balances are not carried forward automatically.
+          </p>
+        </section>
+
+     
+      </section>
+
+      <!-- CONTRIBUTIONS SCREEN -->
+      <section
+        class="app-screen"
+        data-screen="contributions"
+        aria-label="Contributions"
+        hidden
+      >
+        <div class="contribution-layout">
+          <section class="card">
+            <div class="section-heading">
+              <h2>Add a contribution</h2>
+              <span class="badge">Money in</span>
+            </div>
+
+            <form id="incomeForm">
+              <label>
+                Person's name
+
+                <input
+                  id="personName"
+                  type="text"
+                  maxlength="80"
+                  placeholder="e.g. Kasun"
+                  required
+                >
+              </label>
+
+              <label>
+                Amount
+
+                <input
+                  id="personAmount"
+                  type="number"
+                  min="0.01"
+                  max="1000000000"
+                  step="0.01"
+                  inputmode="decimal"
+                  placeholder="0.00"
+                  required
+                >
+              </label>
+
+              <label>
+                Date
+                <input id="incomeDate" type="date" required>
+              </label>
+
+              <button type="submit" class="full">
+                + Add contribution
+              </button>
+            </form>
+          </section>
+
+          <section class="card">
+            <div class="section-heading">
+              <h2>Contributions by person</h2>
+
+              <span id="peopleCount" class="badge">
+                0 people
+              </span>
+            </div>
+
+            <p class="help">
+              Multiple contributions from the same person
+              are added together here.
+            </p>
+
+            <div id="peopleList"></div>
+          </section>
+        </div>
+      </section>
+
+      <!-- EXPENSES SCREEN -->
+      <section
+        class="app-screen"
+        data-screen="expenses"
+        aria-label="Expenses"
+        hidden
+      >
+        <section class="card">
+          <div class="section-heading">
+            <h2>Monthly bills</h2>
+            <span class="badge">Money out</span>
+          </div>
+
+          <p class="help">
+            Enter the amount and press Save.
+            Updating a bill replaces its previous amount.
+            Enter 0 to remove it.
+          </p>
+
+          <div id="billsList"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-heading">
+            <div>
+              <h2>Additional expenses</h2>
+
+              <p class="help">
+                Groceries, repairs, supplies, and more.
+              </p>
+            </div>
+
+            <button id="toggleExpense" type="button">
+              + Add expense
+            </button>
+          </div>
+
+          <form id="expenseForm" hidden>
+            <div class="expense-fields">
+              <label>
+                Expense name
+
+                <input
+                  id="expenseName"
+                  type="text"
+                  maxlength="80"
+                  placeholder="e.g. Groceries"
+                  required
+                >
+              </label>
+
+              <label>
+                Amount
+
+                <input
+                  id="expenseAmount"
+                  type="number"
+                  min="0.01"
+                  max="1000000000"
+                  step="0.01"
+                  inputmode="decimal"
+                  placeholder="0.00"
+                  required
+                >
+              </label>
+
+              <label>
+                Date
+
+                <input
+                  id="expenseDate"
+                  type="date"
+                  required
+                >
+              </label>
+            </div>
+
+            <button type="submit">Save expense</button>
+          </form>
+
+          <div id="extrasList"></div>
+        </section>
+      </section>
+
+      <!-- HISTORY SCREEN -->
+      <section
+        class="app-screen"
+        data-screen="history"
+        aria-label="Transaction history"
+        hidden
+      >
+        <section class="card">
+          <div class="section-heading">
+            <h2>Monthly transactions</h2>
+
+            <div
+              class="filters"
+              aria-label="Filter transactions"
+            >
+              <button
+                type="button"
+                data-filter="all"
+                aria-pressed="true"
+              >
+                All
+              </button>
+
+              <button
+                type="button"
+                data-filter="income"
+                aria-pressed="false"
+              >
+                Contributions
+              </button>
+
+              <button
+                type="button"
+                data-filter="expense"
+                aria-pressed="false"
+              >
+                Expenses
+              </button>
+            </div>
+          </div>
+
+          <div id="transactionsList"></div>
+        </section>
+      </section>
+
+      <!-- SETTINGS SCREEN -->
+      <section
+        class="app-screen"
+        data-screen="settings"
+        aria-label="Settings"
+        hidden
+      >
+        <section class="card">
+          <h2>Currency</h2>
+
+          <label class="currency-field">
+            Display currency
+
+            <select id="currencyPicker">
+              <option value="LKR">
+                Sri Lankan Rupees — LKR
+              </option>
+
+              <option value="JPY">
+                Japanese Yen — JPY
+              </option>
+
+              <option value="USD">
+                US Dollars — USD
+              </option>
+            </select>
+          </label>
+
+          <p class="help">
+            Changing the currency changes the label only.
+            It does not convert your amounts.
+          </p>
+        </section>
+
+        <section class="card">
+          <h2>Backup & restore</h2>
+
+          <p class="help">
+            Download a backup of all months.
+            Keep it somewhere safe.
+          </p>
+
+          <div class="backup-actions">
+            <button id="downloadBackup" type="button">
+              Download backup
+            </button>
+
+            <label class="file-button secondary">
+              Restore backup
+
+              <input
+                id="restoreBackup"
+                type="file"
+                accept=".json,application/json"
+                hidden
+              >
+            </label>
+          </div>
+
+          <p class="help">
+            Restoring replaces all data currently saved
+            in this browser.
+          </p>
+        </section>
+
+        <section class="card">
+          <h2>Install on your phone</h2>
+
+          <p class="help">
+            Open your browser menu and choose
+            “Add to Home Screen” or “Install app”,
+            if available.
+          </p>
+
+          <button
+            id="installButton"
+            type="button"
+            class="secondary"
+            hidden
+          >
+            Install app
+          </button>
+
+          <p id="offlineStatus" class="help"></p>
+        </section>
+
+        <section class="card">
+          <h2>Where is my data stored?</h2>
+
+          <p class="help">
+            Your financial data is stored in this browser
+            using IndexedDB. It is not uploaded to a server
+            or automatically shared between devices.
+          </p>
+
+          <p class="help">
+            Clearing browser data may remove your records.
+            Download a backup regularly.
+          </p>
+        </section>
+      </section>
+
+    </fieldset>
+
+    <footer>
+      Private to this browser. Remember to back up your data.
+    </footer>
+  </main>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+ <script src="./app.js?v=7" defer></script>
+
+<!-- Custom app popup -->
+<dialog id="appDialog" class="app-dialog">
+  <form id="appDialogForm">
+    <div id="popupIcon" class="popup-icon" aria-hidden="true">
+      !
+    </div>
+
+    <h2 id="popupTitle">Confirm action</h2>
+
+    <p id="popupMessage"></p>
+
+    <label id="popupInputLabel" hidden>
+      <span id="popupInputText">Value</span>
+
+      <input
+        id="popupInput"
+        type="text"
+        autocomplete="off"
+      >
+    </label>
+
+    <div class="popup-actions">
+      <button
+        id="popupCancel"
+        type="button"
+        class="popup-cancel"
+      >
+        Cancel
+      </button>
+
+      <button
+        id="popupConfirm"
+        type="submit"
+        class="popup-confirm"
+      >
+        Confirm
+      </button>
+    </div>
+  </form>
+</dialog>
+
+</body>
+</html>
